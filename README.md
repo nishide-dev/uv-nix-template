@@ -69,7 +69,7 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 ```bash
 # 新しいプロジェクトを生成
-uvx copier copy gh:nishide-dev/uv-nix-template my-awesome-project
+uvx copier copy --trust gh:nishide-dev/uv-nix-template my-awesome-project
 
 # プロジェクトに移動
 cd my-awesome-project
@@ -82,10 +82,10 @@ uv sync
 
 ```bash
 # テンプレートをクローン
-git clone https://github.com/your-org/uv-nix-template.git
+git clone https://github.com/nishide-dev/uv-nix-template.git
 
 # ローカルパスから生成
-uvx copier copy ./uv-nix-template my-awesome-project
+uvx copier copy --trust ./uv-nix-template my-awesome-project
 ```
 
 ## 📝 生成時の質問
@@ -137,7 +137,7 @@ my-awesome-project/
 
 ```bash
 # プロジェクト生成
-uvx copier copy gh:your-org/uv-nix-template ml-experiment
+uvx copier copy --trust gh:nishide-dev/uv-nix-template ml-experiment
 cd ml-experiment
 
 # 依存関係の追加
@@ -189,11 +189,11 @@ git diff
 
 ```bash
 # ベーステンプレートでプロジェクト生成
-uvx copier copy gh:your-org/uv-nix-template my-gpu-project
+uvx copier copy --trust gh:nishide-dev/uv-nix-template my-gpu-project
 cd my-gpu-project
 
 # CUDA/Nix拡張を追加適用
-uvx copier copy gh:your-org/uv-cuda-nix-template .
+uvx copier copy --trust gh:nishide-dev/uv-cuda-nix-template .
 ```
 
 ## 📄 ライセンス
