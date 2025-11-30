@@ -98,17 +98,27 @@ _exclude:
 # ============================================================================
 
 _tasks:
-  # Git リポジトリの初期化（mainブランチで開始）
   - "git init -b main"
-
-  # uv による環境構築と依存解決
   - "uv venv"
   - "uv lock"
   - "uv sync"
-
-  # コード品質チェック
   - |
-    {% if use_ruff %}uv run ruff check . && uv run ruff format --check . && {% endif %}{% if use_ty %}uv run ty check && {% endif %}{% if use_pytest %}uv run pytest && {% endif %}echo "✅ All quality checks passed!"
+    set -e
+    {% if use_ruff %}
+    echo "🔍 Ruff check..."
+    uv run ruff check .
+    echo "✨ Ruff format check..."
+    uv run ruff format --check .
+    {% endif %}
+    {% if use_ty %}
+    echo "🔎 Type checking..."
+    uv run ty check
+    {% endif %}
+    {% if use_pytest %}
+    echo "🧪 Running tests..."
+    uv run pytest
+    {% endif %}
+    echo "✅ All quality checks passed!"
 
   # 成功メッセージ
   - |

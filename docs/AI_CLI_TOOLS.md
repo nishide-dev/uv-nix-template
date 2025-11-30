@@ -50,7 +50,46 @@ export ANTHROPIC_API_KEY="your-api-key"
 # ~/.config/claude/config.json
 ```
 
-### 2. Gemini CLI
+### 2. OpenAI Codex
+
+**公式**: https://openai.com/
+
+OpenAI社のCodexをコマンドラインから利用できるツールです。
+
+#### インストール方法
+
+Nix環境では自動的にインストールされます（初回環境構築時）：
+
+```bash
+npm install -g @openai/codex
+```
+
+#### 基本的な使い方
+
+```bash
+# Codexと対話
+codex
+
+# コード生成
+codex generate "Write a Python function to calculate fibonacci"
+
+# ヘルプ
+codex --help
+```
+
+#### 設定
+
+初回起動時にAPIキーの設定が必要です：
+
+```bash
+# APIキーの設定
+export OPENAI_API_KEY="your-api-key"
+
+# または設定ファイルに記載
+# ~/.config/openai/config.json
+```
+
+### 3. Gemini CLI
 
 **公式**: https://ai.google.dev/
 

@@ -106,6 +106,14 @@
               }
             fi
 
+            # OpenAI Codexのインストール確認
+            if ! command -v codex &> /dev/null; then
+              echo -e "''${YELLOW}Installing OpenAI Codex...''${NC}"
+              npm install -g @openai/codex 2>/dev/null || {
+                echo -e "''${YELLOW}Note: OpenAI Codex installation failed. You may need to install it manually.''${NC}"
+              }
+            fi
+
             # Gemini CLIのインストール確認
             if ! command -v gemini &> /dev/null; then
               echo -e "''${YELLOW}Installing Gemini CLI...''${NC}"
@@ -127,6 +135,9 @@
             if command -v claude &> /dev/null; then
               echo "Claude Code: $(claude --version 2>/dev/null || echo 'installed')"
             fi
+            if command -v codex &> /dev/null; then
+              echo "OpenAI Codex: $(codex --version 2>/dev/null || echo 'installed')"
+            fi
             if command -v gemini &> /dev/null; then
               echo "Gemini CLI:  $(gemini --version 2>/dev/null || echo 'installed')"
             fi
@@ -140,6 +151,7 @@
             echo ""
             echo "  AI CLIs:"
             echo "    claude               # Claude Code CLI"
+            echo "    codex                # OpenAI Codex"
             echo "    gemini               # Gemini CLI"
             echo "=================================================="
             echo ""
