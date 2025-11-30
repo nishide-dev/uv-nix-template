@@ -7,6 +7,7 @@ on:
     branches: [main]
 
 jobs:
+{%- if use_pytest %}
   test:
     name: Test on Python {% raw %}${{ matrix.python-version }}{% endraw %}
     runs-on: {% raw %}${{ matrix.os }}{% endraw %}
@@ -49,33 +50,13 @@ jobs:
         run: |
           uv sync --all-extras --dev
 
-{%- if use_ruff %}
-
-      - name: Check code formatting with Ruff
-        run: |
-          uv run ruff format --check .
-
-      - name: Lint code with Ruff
-        run: |
-          uv run ruff check .
-{%- endif %}
-
-{%- if use_ty %}
-
-      - name: Type check with ty
-        run: |
-          uv run ty check
-{%- endif %}
-
-{%- if use_pytest %}
-
       - name: Run tests with Pytest
         run: |
           uv run pytest --cov=src --cov-report=xml --cov-report=term
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
-        if: {% raw %}matrix.python-version == '{{ python_version }}'{% endraw %}
+        if: {% raw %}matrix.python-version == '{% endraw %}{{ python_version }}{% raw %}'{% endraw %}
         with:
           file: ./coverage.xml
           fail_ci_if_error: false

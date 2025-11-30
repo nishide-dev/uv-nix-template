@@ -106,6 +106,10 @@ _tasks:
   - "uv lock"
   - "uv sync"
 
+  # コード品質チェック
+  - |
+    {% if use_ruff %}uv run ruff check . && uv run ruff format --check . && {% endif %}{% if use_ty %}uv run ty check && {% endif %}{% if use_pytest %}uv run pytest && {% endif %}echo "✅ All quality checks passed!"
+
   # 成功メッセージ
   - |
     echo "

@@ -40,16 +40,15 @@ class TestHello:
 # Install pytest with: uv add --dev pytest
 # Then run: uv run pytest
 
+
 def test_hello() -> None:
     """Test the hello function."""
     result = hello()
     assert isinstance(result, str), "hello() should return a string"
     assert "{{ project_name }}" in result, f"Expected project name in: {result}"
-    print(f"✓ test_hello passed: {result}")
 
 
 if __name__ == "__main__":
     test_hello()
-    print("All tests passed!")
 
 {%- endif %}
