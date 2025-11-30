@@ -15,10 +15,10 @@
 - **Copy-on-Write**: グローバルキャッシュによりディスク使用量を最小化
 - **決定論的ビルド**: `uv.lock`による厳密な依存関係の固定
 
-### 🛠️ モダンな開発ツール統合（全てRust製）
+### 🛠️ モダンな開発ツール統合
 
 - **Ruff**: 極めて高速なlinter/formatter
-- **ty**: 超高速型チェッカー（Astral社製）
+- **ty**: 超高速型チェッカー
 - **Pytest**: テストフレームワーク + カバレッジ
 - **GitHub Actions**: 自動CI/CD
 
@@ -216,7 +216,7 @@ git diff
 
 このベーステンプレートに加えて、以下の拡張テンプレートも利用可能です：
 
-- **[uv-cuda-nix-template](https://github.com/your-org/uv-cuda-nix-template)**: CUDA/GPU環境とNixによるシステムレベル再現性を追加
+- **[uv-cuda-nix-template](https://github.com/nishide-dev/uv-cuda-nix-template)**: CUDA/GPU環境とNixによるシステムレベル再現性を追加
 
 拡張テンプレートの適用方法：
 
@@ -253,8 +253,6 @@ MIT License
 
 ## 🤝 コントリビューション
 
-Issue/PRは大歓迎です！
-
 テンプレートに関するフィードバックは、以下のIssueテンプレートをご利用ください：
 - バグレポート
 - 機能リクエスト
@@ -269,7 +267,3 @@ Issue/PRは大歓迎です！
 - [PEP 621 – Storing project metadata in pyproject.toml](https://peps.python.org/pep-0621/)
 - [PEP 735 – Dependency Groups in pyproject.toml](https://peps.python.org/pep-0735/)
 - [Nix + uv での Python 開発環境構築](https://zenn.dev/shundeveloper/articles/36307d821d40f7)
-
----
-
-Generated with ❤️ using modern Python tooling
