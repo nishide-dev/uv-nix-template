@@ -85,6 +85,7 @@ _exclude:
   - "dist"
   - "build"
   - "*.egg-info"
+  - "README.md"  # テンプレートリポジトリ自体のREADME（生成プロジェクトには含めない）
   - "TEMPLATE_README.md"  # テンプレート使用者向けのREADME (生成プロジェクトには含めない)
   - ".github/ISSUE_TEMPLATE"  # テンプレートリポジトリ用のIssueテンプレート（生成プロジェクトには含めない）
   - ".github/pull_request_template.md"  # テンプレートリポジトリ用のPRテンプレート（生成プロジェクトには含めない）
