@@ -98,18 +98,13 @@ _exclude:
 # ============================================================================
 
 _tasks:
-  # Git リポジトリの初期化
-  - "git init"
-  - "git branch -m main"  # デフォルトブランチをmainに設定
-  - "git add ."
+  # Git リポジトリの初期化（mainブランチで開始）
+  - "git init -b main"
 
   # uv による環境構築と依存解決
   - "uv venv"
   - "uv lock"
   - "uv sync"
-
-  # 初期コミット
-  - 'git commit -m "chore: initial commit from uv-nix-template"'
 
   # 成功メッセージ
   - |
@@ -122,13 +117,17 @@ _tasks:
       1. プロジェクトディレクトリに移動:
          cd {{ project_name }}
 
-      2. 開発を開始 (仮想環境は既にセットアップ済み):
+      2. 初回コミット:
+         git add .
+         git commit -m \"chore: initial commit\"
+
+      3. 開発を開始 (仮想環境は既にセットアップ済み):
          uv add <package-name>      # 依存関係の追加
          uv run pytest              # テストの実行
          uv run ruff format .       # コードフォーマット
          uv run ty check            # 型チェック
 
-      3. (オプション) CUDA/Nix環境が必要な場合:
+      4. (オプション) CUDA/Nix環境が必要な場合:
          copier copy --trust gh:nishide-dev/uv-cuda-nix-template .
 
     ============================================================
