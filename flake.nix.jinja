@@ -22,7 +22,7 @@
         # 注意: 初回ビルドに時間がかかります
         uv-from-cargo = pkgs.rustPlatform.buildRustPackage rec {
           pname = "uv";
-          version = "0.5.1"; # 必要に応じて更新してください
+          version = "0.9.13"; # 必要に応じて更新してください
 
           src = pkgs.fetchFromGitHub {
             owner = "astral-sh";
