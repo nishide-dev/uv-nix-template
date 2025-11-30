@@ -88,6 +88,7 @@ _exclude:
   - "TEMPLATE_README.md"  # テンプレート使用者向けのREADME (生成プロジェクトには含めない)
   - ".github/ISSUE_TEMPLATE"  # テンプレートリポジトリ用のIssueテンプレート（生成プロジェクトには含めない）
   - ".github/pull_request_template.md"  # テンプレートリポジトリ用のPRテンプレート（生成プロジェクトには含めない）
+  - "{% if not use_ruff %}ruff.toml.jinja{% endif %}"  # Ruff未使用の場合は除外
   - "{% if not use_nix %}flake.nix.jinja{% endif %}"  # Nix未使用の場合は除外
   - "{% if not use_nix %}.envrc{% endif %}"  # Nix未使用の場合は除外
   - "{% if not use_nix %}docs{% endif %}"  # Nix未使用の場合はdocsディレクトリ全体を除外
