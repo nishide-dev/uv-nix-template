@@ -10,8 +10,8 @@
 {%- if use_ruff %}
 - 🔍 **Code quality** with Ruff (linter + formatter)
 {%- endif %}
-{%- if use_mypy %}
-- 🔒 **Type safety** with Mypy
+{%- if use_ty %}
+- 🔒 **Type safety** with ty
 {%- endif %}
 {%- if use_pytest %}
 - ✅ **Testing** with Pytest
@@ -133,17 +133,17 @@ uv run ruff check --fix .
 
 ### Type checking
 
-{%- if use_mypy %}
+{%- if use_ty %}
 
 ```bash
-uv run mypy src
+uv run ty check
 ```
 
 {%- else %}
 
 ```bash
-# Mypy is not configured yet
-# Install mypy: uv add --dev mypy
+# ty is not configured yet
+# Install ty: uv add --dev ty
 ```
 
 {%- endif %}

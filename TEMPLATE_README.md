@@ -18,7 +18,7 @@
 ### 🛠️ モダンな開発ツール統合
 
 - **Ruff**: 極めて高速なlinter/formatter（Rust製）
-- **Mypy**: 静的型チェック
+- **ty**: 超高速型チェッカー（Rust製、Astral社製）
 - **Pytest**: テストフレームワーク + カバレッジ
 - **GitHub Actions**: 自動CI/CD
 
@@ -110,7 +110,7 @@ Copierは以下の質問をします：
 | `author_email` | 作者のメールアドレス | `your.email@example.com` |
 | `python_version` | 最小Pythonバージョン | `3.12` |
 | `use_ruff` | Ruffを使うか | `true` |
-| `use_mypy` | Mypyを使うか | `true` |
+| `use_ty` | ty（型チェッカー）を使うか | `true` |
 | `use_pytest` | Pytestを使うか | `true` |
 | `use_github_actions` | GitHub Actionsを設定するか | `true` |
 | `use_nix` | Nix + direnv環境管理を使うか | `true` |
@@ -164,7 +164,7 @@ uv run pytest
 uv run ruff format .
 
 # 型チェック
-uv run mypy src
+uv run ty check
 
 # パッケージのビルド
 uv build

@@ -11,13 +11,11 @@ project_name:
   type: str
   help: "プロジェクト名を入力してください (例: my-awesome-lib)"
   placeholder: "my-awesome-lib"
-  validator: "^[a-z][a-z0-9_-]+$"
 
 package_name:
   type: str
   help: "パッケージ名を入力してください (Pythonのインポート名、通常はスネークケース)"
   default: "{{ project_name | replace('-', '_') }}"
-  validator: "^[a-z][a-z0-9_]+$"
 
 description:
   type: str
@@ -49,9 +47,9 @@ use_ruff:
   help: "Ruff (高速linter/formatter) を使用しますか？"
   default: true
 
-use_mypy:
+use_ty:
   type: bool
-  help: "Mypy (型チェッカー) を使用しますか？"
+  help: "ty (高速型チェッカー by Astral) を使用しますか？"
   default: true
 
 use_pytest:

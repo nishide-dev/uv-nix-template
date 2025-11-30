@@ -60,11 +60,11 @@ jobs:
           uv run ruff check .
 {%- endif %}
 
-{%- if use_mypy %}
+{%- if use_ty %}
 
-      - name: Type check with Mypy
+      - name: Type check with ty
         run: |
-          uv run mypy src
+          uv run ty check
 {%- endif %}
 
 {%- if use_pytest %}

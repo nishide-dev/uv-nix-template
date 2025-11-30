@@ -77,15 +77,16 @@ format.indent-style = "space"
 
 {% endif -%}
 
-{% if use_mypy -%}
-# Mypy - 静的型チェッカー
-# https://mypy.readthedocs.io/
-[tool.mypy]
-python_version = "{{ python_version }}"
-strict = true
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+{% if use_ty -%}
+# ty - 高速Python型チェッカー (Rust製)
+# https://docs.astral.sh/ty/
+[tool.ty]
+
+[tool.ty.environment]
+python-version = "{{ python_version }}"
+
+[tool.ty.terminal]
+output-format = "full"
 
 {% endif -%}
 
@@ -127,7 +128,7 @@ dev = [
 {%- if use_ruff %}
     "ruff>=0.6",
 {%- endif %}
-{%- if use_mypy %}
-    "mypy>=1.9",
+{%- if use_ty %}
+    "ty",
 {%- endif %}
 ]
