@@ -1,0 +1,207 @@
+# {{ project_name }}
+
+{{ description }}
+
+## Features
+
+- ⚡ **Fast package management** with [uv](https://github.com/astral-sh/uv)
+- 📦 **Modern Python packaging** using `pyproject.toml` (PEP 621)
+- 🏗️ **Src layout** for better import hygiene
+{%- if use_ruff %}
+- 🔍 **Code quality** with Ruff (linter + formatter)
+{%- endif %}
+{%- if use_mypy %}
+- 🔒 **Type safety** with Mypy
+{%- endif %}
+{%- if use_pytest %}
+- ✅ **Testing** with Pytest
+{%- endif %}
+{%- if use_github_actions %}
+- 🚀 **CI/CD** with GitHub Actions
+{%- endif %}
+
+## Requirements
+
+- Python {{ python_version }}+
+- [uv](https://docs.astral.sh/uv/) (recommended) or pip
+
+## Installation
+
+### For end users
+
+```bash
+# Using uv (recommended)
+uv pip install {{ project_name }}
+
+# Using pip
+pip install {{ project_name }}
+```
+
+### For developers
+
+{%- if use_nix %}
+
+#### With Nix (recommended)
+
+```bash
+# Clone the repository
+git clone https://github.com/{{ author_name }}/{{ project_name }}.git
+cd {{ project_name }}
+
+# Allow direnv (first time only)
+direnv allow
+
+# Environment is automatically activated!
+# Install dependencies
+uv sync
+```
+
+#### Without Nix
+
+{%- endif %}
+
+```bash
+# Clone the repository
+git clone https://github.com/{{ author_name }}/{{ project_name }}.git
+cd {{ project_name }}
+
+# Create virtual environment and install dependencies
+uv venv
+uv sync
+
+# Activate the virtual environment
+source .venv/bin/activate  # Linux/macOS
+# or
+.venv\Scripts\activate  # Windows
+```
+
+## Usage
+
+```python
+from {{ package_name }} import hello
+
+print(hello())
+# Output: Hello from {{ project_name }}!
+```
+
+## Development
+
+### Running tests
+
+{%- if use_pytest %}
+
+```bash
+# Run all tests
+uv run pytest
+
+# Run with coverage
+uv run pytest --cov=src --cov-report=html
+```
+
+{%- else %}
+
+```bash
+# Tests are not configured yet
+# Install pytest: uv add --dev pytest
+```
+
+{%- endif %}
+
+### Code formatting and linting
+
+{%- if use_ruff %}
+
+```bash
+# Format code
+uv run ruff format .
+
+# Lint code
+uv run ruff check .
+
+# Fix auto-fixable issues
+uv run ruff check --fix .
+```
+
+{%- else %}
+
+```bash
+# Ruff is not configured yet
+# Install ruff: uv add --dev ruff
+```
+
+{%- endif %}
+
+### Type checking
+
+{%- if use_mypy %}
+
+```bash
+uv run mypy src
+```
+
+{%- else %}
+
+```bash
+# Mypy is not configured yet
+# Install mypy: uv add --dev mypy
+```
+
+{%- endif %}
+
+### Adding dependencies
+
+```bash
+# Add a runtime dependency
+uv add <package-name>
+
+# Add a development dependency
+uv add --dev <package-name>
+
+# Update all dependencies
+uv lock --upgrade
+```
+
+## Project Structure
+
+```
+{{ project_name }}/
+├── src/
+│   └── {{ package_name }}/
+│       ├── __init__.py
+│       └── py.typed          # Type information marker
+{%- if use_pytest %}
+├── tests/
+│   ├── __init__.py
+│   └── test_{{ package_name }}.py
+{%- endif %}
+{%- if use_nix %}
+├── flake.nix                 # Nix environment definition
+├── .envrc                    # direnv configuration
+├── docs/
+│   ├── NIX_SETUP.md          # Nix setup guide
+│   └── AI_CLI_TOOLS.md       # AI CLI tools guide
+{%- endif %}
+├── pyproject.toml            # Project configuration
+├── uv.lock                   # Dependency lock file
+├── .gitignore
+├── .python-version           # Python version specification
+├── LICENSE
+├── README.md                 # This file
+{%- if use_github_actions %}
+└── .github/
+    └── workflows/
+        └── test.yml          # CI/CD configuration
+{%- endif %}
+```
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+Generated with ❤️ using [uv-nix-template](https://github.com/your-org/uv-nix-template)

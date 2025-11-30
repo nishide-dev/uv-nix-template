@@ -1,0 +1,150 @@
+{
+  description = "Python development environment with uv and Nix";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+
+        # Pythonバージョンの選択
+        python = pkgs.python{{ python_version | replace('.', '') }};
+
+        # uvのインストール方法を選択
+        # Option 1: nixpkgsから（安定版、高速）
+        uv-from-nixpkgs = pkgs.uv;
+
+        # Option 2: cargoから最新版をビルド（より新しいバージョン）
+        # 注意: 初回ビルドに時間がかかります
+        uv-from-cargo = pkgs.rustPlatform.buildRustPackage rec {
+          pname = "uv";
+          version = "0.5.1"; # 必要に応じて更新してください
+
+          src = pkgs.fetchFromGitHub {
+            owner = "astral-sh";
+            repo = "uv";
+            rev = version;
+            hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # nix flake update で更新
+          };
+
+          cargoHash = "sha256-BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB="; # nix build で自動計算
+
+          # ビルド時のネイティブ依存
+          nativeBuildInputs = with pkgs; [
+            pkg-config
+          ];
+
+          # ランタイム依存
+          buildInputs = with pkgs; [
+            openssl
+          ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+            pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
+          ];
+
+          # テストはスキップ（ビルド時間短縮のため）
+          doCheck = false;
+        };
+
+        # どちらを使うか選択（デフォルトはnixpkgs版）
+        # 最新版が必要な場合は uv-from-cargo に変更してください
+        uv = uv-from-nixpkgs;
+
+      in {
+        devShells.default = pkgs.mkShell {
+          packages = [
+            # Python環境
+            python
+            uv
+
+            # Node.js環境（AI CLIツール用）
+            pkgs.nodejs_22  # Node.js LTS
+            # pkgs.nodePackagesはnpmを含む
+
+            # 開発ツール
+            pkgs.git
+            pkgs.curl
+          ];
+
+          env = {
+            # uvにNix提供のPythonを使用させる
+            UV_PYTHON = "${python}/bin/python";
+
+            # uvが勝手にPythonをダウンロードしないようにする
+            UV_PYTHON_DOWNLOADS = "never";
+
+            # npmグローバルインストール先をローカルに設定
+            # これによりsudoなしでnpm install -gが可能になる
+            NPM_CONFIG_PREFIX = "$HOME/.npm-global";
+          };
+
+          shellHook = ''
+            # カラー出力
+            GREEN='\033[0;32m'
+            YELLOW='\033[1;33m'
+            BLUE='\033[0;34m'
+            NC='\033[0m' # No Color
+
+            # npmグローバルパスをPATHに追加
+            export PATH="$HOME/.npm-global/bin:$PATH"
+
+            # AI CLIツールのインストール確認とインストール
+            echo ""
+            echo "=================================================="
+            echo -e "''${BLUE}Checking AI CLI Tools...''${NC}"
+            echo "=================================================="
+
+            # Claude Code CLIのインストール確認
+            if ! command -v claude &> /dev/null; then
+              echo -e "''${YELLOW}Installing Claude Code CLI...''${NC}"
+              npm install -g @anthropic-ai/claude-code 2>/dev/null || {
+                echo -e "''${YELLOW}Falling back to curl installation method...''${NC}"
+                curl -fsSL https://claude.ai/install.sh | bash
+              }
+            fi
+
+            # Gemini CLIのインストール確認
+            if ! command -v gemini &> /dev/null; then
+              echo -e "''${YELLOW}Installing Gemini CLI...''${NC}"
+              npm install -g @google/gemini-cli 2>/dev/null || {
+                echo -e "''${YELLOW}Note: Gemini CLI installation failed. You may need to install it manually.''${NC}"
+              }
+            fi
+
+            echo ""
+            echo "=================================================="
+            echo -e "''${GREEN}Development Environment Ready''${NC}"
+            echo "=================================================="
+            echo "Python:      $(python --version)"
+            echo "uv:          $(uv --version)"
+            echo "Node.js:     $(node --version)"
+            echo "npm:         $(npm --version)"
+
+            # CLIツールのバージョン確認（インストール済みの場合のみ）
+            if command -v claude &> /dev/null; then
+              echo "Claude Code: $(claude --version 2>/dev/null || echo 'installed')"
+            fi
+            if command -v gemini &> /dev/null; then
+              echo "Gemini CLI:  $(gemini --version 2>/dev/null || echo 'installed')"
+            fi
+
+            echo ""
+            echo "次のステップ:"
+            echo "  Python:"
+            echo "    uv sync              # 依存関係のインストール"
+            echo "    uv add <package>     # パッケージの追加"
+            echo "    uv run pytest        # テストの実行"
+            echo ""
+            echo "  AI CLIs:"
+            echo "    claude               # Claude Code CLI"
+            echo "    gemini               # Gemini CLI"
+            echo "=================================================="
+            echo ""
+          '';
+        };
+      }
+    );
+}

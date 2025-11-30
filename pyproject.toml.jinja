@@ -1,0 +1,133 @@
+# pyproject.toml - Python project configuration
+# This file is generated from the uv-nix-template Copier template
+
+[project]
+name = "{{ project_name }}"
+version = "0.1.0"
+description = "{{ description }}"
+readme = "README.md"
+authors = [
+    { name = "{{ author_name }}", email = "{{ author_email }}" }
+]
+requires-python = ">={{ python_version }}"
+dependencies = []
+
+# Classifiers help users find your project
+# See https://pypi.org/classifiers/
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: {{ python_version }}",
+{%- if python_version == "3.10" %}
+    "Programming Language :: Python :: 3.10",
+{%- endif %}
+{%- if python_version in ["3.10", "3.11"] %}
+    "Programming Language :: Python :: 3.11",
+{%- endif %}
+{%- if python_version in ["3.10", "3.11", "3.12"] %}
+    "Programming Language :: Python :: 3.12",
+{%- endif %}
+    "Programming Language :: Python :: 3.13",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+managed = true  # uvによる環境管理を有効化
+dev-dependencies = []
+
+# Hatch build configuration
+[tool.hatch.build.targets.wheel]
+packages = ["src/{{ package_name }}"]
+
+# ============================================================================
+# Development tool configurations
+# ============================================================================
+
+{% if use_ruff -%}
+# Ruff - 高速なPython linter/formatter (Rustで実装)
+# https://docs.astral.sh/ruff/
+[tool.ruff]
+line-length = 100
+target-version = "py{{ python_version | replace('.', '') }}"
+
+# 有効にするルール
+lint.select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "SIM",    # flake8-simplify
+]
+
+# 無視するルール
+lint.ignore = [
+    "E501",   # line too long (formatterが自動整形)
+]
+
+# Formatter設定
+format.quote-style = "double"
+format.indent-style = "space"
+
+{% endif -%}
+
+{% if use_mypy -%}
+# Mypy - 静的型チェッカー
+# https://mypy.readthedocs.io/
+[tool.mypy]
+python_version = "{{ python_version }}"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+{% endif -%}
+
+{% if use_pytest -%}
+# Pytest - テストフレームワーク
+# https://docs.pytest.org/
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--showlocals",
+]
+
+# Coverage settings (pytest-cov plugin)
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+{% endif -%}
+
+# ============================================================================
+# Dependency Groups (PEP 735)
+# https://peps.python.org/pep-0735/
+# ============================================================================
+
+[dependency-groups]
+dev = [
+{%- if use_pytest %}
+    "pytest>=8.0",
+    "pytest-cov>=4.1",
+{%- endif %}
+{%- if use_ruff %}
+    "ruff>=0.6",
+{%- endif %}
+{%- if use_mypy %}
+    "mypy>=1.9",
+{%- endif %}
+]

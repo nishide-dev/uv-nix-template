@@ -1,0 +1,59 @@
+"""Tests for {{ package_name }}."""
+
+{%- if use_pytest %}
+import pytest
+{%- endif %}
+
+from {{ package_name }} import hello
+
+
+{%- if use_pytest %}
+
+
+def test_hello() -> None:
+    """Test the hello function."""
+    result = hello()
+    assert isinstance(result, str)
+    assert "{{ project_name }}" in result
+    assert result == "Hello from {{ project_name }}!"
+
+
+def test_hello_return_type() -> None:
+    """Test that hello returns a string."""
+    result = hello()
+    assert isinstance(result, str)
+
+
+class TestHello:
+    """Test class for hello function."""
+
+    def test_hello_not_empty(self) -> None:
+        """Test that hello returns a non-empty string."""
+        result = hello()
+        assert len(result) > 0
+
+    def test_hello_contains_project_name(self) -> None:
+        """Test that hello contains the project name."""
+        result = hello()
+        assert "{{ project_name }}" in result
+
+{%- else %}
+
+
+# Basic test without pytest
+# Install pytest with: uv add --dev pytest
+# Then run: uv run pytest
+
+def test_hello() -> None:
+    """Test the hello function."""
+    result = hello()
+    assert isinstance(result, str), "hello() should return a string"
+    assert "{{ project_name }}" in result, f"Expected project name in: {result}"
+    print(f"✓ test_hello passed: {result}")
+
+
+if __name__ == "__main__":
+    test_hello()
+    print("All tests passed!")
+
+{%- endif %}

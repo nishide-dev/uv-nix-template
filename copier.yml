@@ -1,0 +1,145 @@
+# Copier template configuration for uv-nix-template
+# This template creates a modern Python library project with uv package management
+
+_min_copier_version: "9.0.0"
+
+# ============================================================================
+# User questions - collected when generating a new project
+# ============================================================================
+
+project_name:
+  type: str
+  help: "プロジェクト名を入力してください (例: my-awesome-lib)"
+  placeholder: "my-awesome-lib"
+  validator: "^[a-z][a-z0-9_-]+$"
+
+package_name:
+  type: str
+  help: "パッケージ名を入力してください (Pythonのインポート名、通常はスネークケース)"
+  default: "{{ project_name | replace('-', '_') }}"
+  validator: "^[a-z][a-z0-9_]+$"
+
+description:
+  type: str
+  help: "プロジェクトの短い説明を入力してください"
+  placeholder: "A modern Python library"
+
+author_name:
+  type: str
+  help: "作者名を入力してください"
+  placeholder: "Your Name"
+
+author_email:
+  type: str
+  help: "作者のメールアドレスを入力してください"
+  placeholder: "your.email@example.com"
+
+python_version:
+  type: str
+  help: "対象とする最小Pythonバージョンを選択してください"
+  default: "3.12"
+  choices:
+    - "3.10"
+    - "3.11"
+    - "3.12"
+    - "3.13"
+
+use_ruff:
+  type: bool
+  help: "Ruff (高速linter/formatter) を使用しますか？"
+  default: true
+
+use_mypy:
+  type: bool
+  help: "Mypy (型チェッカー) を使用しますか？"
+  default: true
+
+use_pytest:
+  type: bool
+  help: "Pytest (テストフレームワーク) を使用しますか？"
+  default: true
+
+use_github_actions:
+  type: bool
+  help: "GitHub Actions CI/CDを設定しますか？"
+  default: true
+
+use_nix:
+  type: bool
+  help: "Nix + direnv による開発環境管理を使用しますか？"
+  default: true
+
+# ============================================================================
+# File/directory exclusion settings
+# ============================================================================
+
+_exclude:
+  - "copier.yml"
+  - "copier.yaml"
+  - ".git"
+  - ".venv"
+  - "__pycache__"
+  - "*.pyc"
+  - ".pytest_cache"
+  - ".mypy_cache"
+  - ".ruff_cache"
+  - "uv.lock"  # ロックファイルは生成時に新規作成
+  - "dist"
+  - "build"
+  - "*.egg-info"
+  - "TEMPLATE_README.md"  # テンプレート使用者向けのREADME (生成プロジェクトには含めない)
+  - ".github/ISSUE_TEMPLATE"  # テンプレートリポジトリ用のIssueテンプレート（生成プロジェクトには含めない）
+  - ".github/pull_request_template.md"  # テンプレートリポジトリ用のPRテンプレート（生成プロジェクトには含めない）
+  - "{% if not use_nix %}flake.nix.jinja{% endif %}"  # Nix未使用の場合は除外
+  - "{% if not use_nix %}.envrc{% endif %}"  # Nix未使用の場合は除外
+  - "{% if not use_nix %}docs{% endif %}"  # Nix未使用の場合はdocsディレクトリ全体を除外
+
+# ============================================================================
+# Post-generation tasks
+# ============================================================================
+
+_tasks:
+  # Git リポジトリの初期化
+  - "git init"
+  - "git add ."
+
+  # uv による環境構築と依存解決
+  - "uv venv"
+  - "uv lock"
+  - "uv sync"
+
+  # 初期コミット
+  - 'git commit -m "chore: initial commit from uv-nix-template"'
+
+  # 成功メッセージ
+  - |
+    echo "
+    ============================================================
+    🎉 プロジェクトが正常に作成されました！
+    ============================================================
+
+    次のステップ:
+      1. プロジェクトディレクトリに移動:
+         cd {{ project_name }}
+
+      2. 仮想環境をアクティベート:
+         source .venv/bin/activate  # Linux/macOS
+
+      3. 開発を開始:
+         uv add <package-name>      # 依存関係の追加
+         uv run pytest              # テストの実行
+         uv run ruff format .       # コードフォーマット
+
+      4. (オプション) CUDA/Nix環境が必要な場合:
+         copier copy gh:your-org/uv-cuda-nix-template .
+
+    ============================================================
+    "
+
+# ============================================================================
+# Template metadata
+# ============================================================================
+
+_metadata:
+  template_version: "0.1.0"
+  min_uv_version: "0.4.0"
