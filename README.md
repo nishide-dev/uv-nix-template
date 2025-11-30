@@ -15,21 +15,7 @@
 - **Copy-on-Write**: グローバルキャッシュによりディスク使用量を最小化
 - **決定論的ビルド**: `uv.lock`による厳密な依存関係の固定
 
-### 🛠️ モダンな開発ツール統合
-
-- **Ruff**: 極めて高速なlinter/formatter
-- **ty**: 超高速型チェッカー
-- **Pytest**: テストフレームワーク + カバレッジ
-- **GitHub Actions**: 自動CI/CD
-
-### 📦 ベストプラクティスの実装
-
-- **Src Layout**: インポートパスの競合を防ぐ推奨構造
-- **PEP 621準拠**: pyproject.tomlによる標準的なメタデータ管理
-- **PEP 735準拠**: dependency-groupsによる依存関係グループ管理
-- **型情報の公開**: py.typedマーカーによる型ヒント配布
-
-### 🔒 完全な再現性（Nix）
+### 🔒 再現性（Nix）
 
 - **Nixによる環境管理**: Pythonバージョンとuvを固定
 - **direnv統合**: ディレクトリに入ると自動で環境アクティベート
@@ -83,7 +69,7 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 ```bash
 # 新しいプロジェクトを生成
-uvx copier copy gh:your-org/uv-nix-template my-awesome-project
+uvx copier copy gh:nishide-dev/uv-nix-template my-awesome-project
 
 # プロジェクトに移動
 cd my-awesome-project
@@ -193,25 +179,6 @@ uvx copier update
 git diff
 ```
 
-これにより、CI設定の改善や開発ツールの最新設定を既存プロジェクトに反映できます。
-
-## 🔗 Copierについて
-
-本テンプレートは[Copier](https://copier.readthedocs.io/)を使用しています。Copierは以下の特徴を持つテンプレートエンジンです：
-
-- **更新機能**: 既存プロジェクトへのテンプレート変更の適用
-- **回答の記憶**: `.copier-answers.yml`による設定の永続化
-- **マージサポート**: テンプレート更新時の差分マージ
-
-### GitHubテンプレートとの違い
-
-| 機能 | GitHub Template | Copier |
-|-----|-----------------|--------|
-| 初回生成 | ✅ | ✅ |
-| 変数の置換 | ❌ | ✅ |
-| テンプレート更新の追従 | ❌ | ✅ |
-| 複数テンプレートの合成 | ❌ | ✅ |
-
 ## 🎯 拡張テンプレート
 
 このベーステンプレートに加えて、以下の拡張テンプレートも利用可能です：
@@ -229,24 +196,6 @@ cd my-gpu-project
 uvx copier copy gh:your-org/uv-cuda-nix-template .
 ```
 
-## 🏗️ 設計思想
-
-このテンプレートは、以下の原則に基づいて設計されています：
-
-1. **Src Layout**: インポートパスの競合を防ぎ、配布時のバグを削減
-2. **PEP準拠**: PEP 621 (pyproject.toml), PEP 735 (dependency-groups)
-3. **ツールの最小化**: uv一つでvirtualenv/pip/twineの役割を担う
-4. **型安全性**: py.typedによる型情報の配布
-5. **Rust製ツール統合**: Ruff, ty, uvによる高速な開発体験
-
-## 📚 関連プロジェクト
-
-- **uv-cuda-nix-template**: CUDA/Nix環境を追加する拡張テンプレート
-- **uv**: https://github.com/astral-sh/uv
-- **ty**: https://docs.astral.sh/ty/
-- **Ruff**: https://github.com/astral-sh/ruff
-- **Copier**: https://copier.readthedocs.io/
-
 ## 📄 ライセンス
 
 MIT License
@@ -258,12 +207,3 @@ MIT License
 - 機能リクエスト
 - テンプレート改善提案
 - ドキュメント改善
-
-## 📖 参考資料
-
-- [uvドキュメント](https://docs.astral.sh/uv/)
-- [tyドキュメント](https://docs.astral.sh/ty/)
-- [Python Packaging User Guide](https://packaging.python.org/)
-- [PEP 621 – Storing project metadata in pyproject.toml](https://peps.python.org/pep-0621/)
-- [PEP 735 – Dependency Groups in pyproject.toml](https://peps.python.org/pep-0735/)
-- [Nix + uv での Python 開発環境構築](https://zenn.dev/shundeveloper/articles/36307d821d40f7)
