@@ -9,8 +9,8 @@ _min_copier_version: "9.0.0"
 
 project_name:
   type: str
-  help: "プロジェクト名を入力してください (例: my-awesome-lib)"
-  placeholder: "my-awesome-lib"
+  help: "プロジェクト名を入力してください (通常はディレクトリ名と同じ)"
+  placeholder: "ディレクトリ名と同じ名前を推奨"
 
 package_name:
   type: str
@@ -120,15 +120,13 @@ _tasks:
       1. プロジェクトディレクトリに移動:
          cd {{ project_name }}
 
-      2. 仮想環境をアクティベート:
-         source .venv/bin/activate  # Linux/macOS
-
-      3. 開発を開始:
+      2. 開発を開始 (仮想環境は既にセットアップ済み):
          uv add <package-name>      # 依存関係の追加
          uv run pytest              # テストの実行
          uv run ruff format .       # コードフォーマット
+         uv run ty check            # 型チェック
 
-      4. (オプション) CUDA/Nix環境が必要な場合:
+      3. (オプション) CUDA/Nix環境が必要な場合:
          copier copy --trust gh:nishide-dev/uv-cuda-nix-template .
 
     ============================================================
