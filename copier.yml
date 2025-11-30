@@ -9,8 +9,8 @@ _min_copier_version: "9.0.0"
 
 project_name:
   type: str
-  help: "プロジェクト名を入力してください (通常はディレクトリ名と同じ)"
-  placeholder: "ディレクトリ名と同じ名前を推奨"
+  help: "プロジェクト名を入力してください (Enterでディレクトリ名を使用)"
+  default: "{{ _copier_conf.dst_path.name }}"
 
 package_name:
   type: str
@@ -20,17 +20,17 @@ package_name:
 description:
   type: str
   help: "プロジェクトの短い説明を入力してください"
-  placeholder: "A modern Python library"
+  default: "A modern Python library"
 
 author_name:
   type: str
   help: "作者名を入力してください"
-  placeholder: "Your Name"
+  default: "Your Name"
 
 author_email:
   type: str
   help: "作者のメールアドレスを入力してください"
-  placeholder: "your.email@example.com"
+  default: "your.email@example.com"
 
 python_version:
   type: str

@@ -78,6 +78,13 @@ cd my-awesome-project
 uv sync
 ```
 
+**ヒント:** git設定から作者情報を自動設定：
+```bash
+uvx copier copy --trust gh:nishide-dev/uv-nix-template my-project \
+  --data author_name="$(git config user.name)" \
+  --data author_email="$(git config user.email)"
+```
+
 #### 方法2: ローカルテンプレートから
 
 ```bash
