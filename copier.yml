@@ -67,6 +67,12 @@ use_nix:
   help: "Nix + direnv による開発環境管理を使用しますか？"
   default: true
 
+setup_direnv_hook:
+  type: bool
+  help: "シェル設定ファイル（~/.bashrc or ~/.zshrc）にdirenv hookを自動追加しますか？"
+  default: false
+  when: "{{ use_nix }}"
+
 # ============================================================================
 # File/directory exclusion settings
 # ============================================================================
@@ -85,7 +91,6 @@ _exclude:
   - "dist"
   - "build"
   - "*.egg-info"
-  - "TEMPLATE_README.md"  # テンプレート使用者向けのREADME (生成プロジェクトには含めない)
   - ".github/ISSUE_TEMPLATE"  # テンプレートリポジトリ用のIssueテンプレート（生成プロジェクトには含めない）
   - ".github/pull_request_template.md"  # テンプレートリポジトリ用のPRテンプレート（生成プロジェクトには含めない）
   - "{% if not use_ruff %}ruff.toml.jinja{% endif %}"  # Ruff未使用の場合は除外
@@ -99,6 +104,17 @@ _exclude:
 
 _tasks:
   - "git init -b main"
+  - |
+    {% if use_nix and setup_direnv_hook %}
+    # シェル設定ファイルへのdirenv hook追加
+    for rcfile in ~/.bashrc ~/.zshrc; do
+      if [ -f "$rcfile" ] && ! grep -q "direnv hook" "$rcfile"; then
+        shell=$(basename "$rcfile" | sed 's/^\.//;s/rc$//')
+        echo 'eval "$(direnv hook '"$shell"')"' >> "$rcfile"
+        echo "✅ Added direnv hook to $rcfile"
+      fi
+    done
+    {% endif %}
   - "uv venv"
   - "uv lock"
   - "uv sync"
