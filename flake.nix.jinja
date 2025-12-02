@@ -78,7 +78,7 @@
 
             # npmグローバルインストール先をローカルに設定
             # これによりsudoなしでnpm install -gが可能になる
-            NPM_CONFIG_PREFIX = "$HOME/.npm-global";
+            # Note: This will be set in shellHook to properly expand $HOME
           };
 
           shellHook = ''
@@ -88,8 +88,10 @@
             BLUE='\033[0;34m'
             NC='\033[0m' # No Color
 
-            # npmグローバルパスをPATHに追加
-            export PATH="$HOME/.npm-global/bin:$PATH"
+            # npmグローバルインストール先を設定
+            export NPM_CONFIG_PREFIX="''${HOME}/.npm-global"
+            export PATH="''${HOME}/.npm-global/bin:$PATH"
+            mkdir -p "''${HOME}/.npm-global/bin"
 
             # AI CLIツールのインストール確認とインストール
             echo ""

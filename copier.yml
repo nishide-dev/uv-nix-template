@@ -104,6 +104,7 @@ _exclude:
 
 _tasks:
   - "git init -b main"
+  - "git add ."
   - |
     {% if use_nix and setup_direnv_hook %}
     # シェル設定ファイルへのdirenv hook追加
@@ -117,14 +118,15 @@ _tasks:
     {% endif %}
   - "uv venv"
   - "uv lock"
+  - "git add uv.lock"
   - "uv sync"
   - |
     set -e
     {% if use_ruff %}
     echo "🔍 Ruff check..."
-    uv run ruff check .
-    echo "✨ Ruff format check..."
-    uv run ruff format --check .
+    uv run ruff check . --fix
+    echo "✨ Ruff format..."
+    uv run ruff format .
     {% endif %}
     {% if use_ty %}
     echo "🔎 Type checking..."
@@ -147,8 +149,7 @@ _tasks:
       1. プロジェクトディレクトリに移動:
          cd {{ project_name }}
 
-      2. 初回コミット:
-         git add .
+      2. 初回コミット (ファイルは既にステージング済み):
          git commit -m \"chore: initial commit\"
 
       3. 開発を開始 (仮想環境は既にセットアップ済み):
@@ -157,8 +158,8 @@ _tasks:
          uv run ruff format .       # コードフォーマット
          uv run ty check            # 型チェック
 
-      4. (オプション) CUDA/Nix環境が必要な場合:
-         copier copy --trust gh:nishide-dev/uv-cuda-nix-template .
+      4. (オプション) PyTorch/CUDA環境が必要な場合:
+         copier copy --trust gh:nishide-dev/uv-torch-nix-template .
 
     ============================================================
     "

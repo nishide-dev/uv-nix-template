@@ -191,17 +191,17 @@ git diff
 
 このベーステンプレートに加えて、以下の拡張テンプレートも利用可能です：
 
-- **[uv-cuda-nix-template](https://github.com/nishide-dev/uv-cuda-nix-template)**: CUDA/GPU環境とNixによるシステムレベル再現性を追加
+- **[uv-torch-nix-template](https://github.com/nishide-dev/uv-torch-nix-template)**: PyTorch/CUDA環境とNixによるシステムレベル再現性を追加
 
 拡張テンプレートの適用方法：
 
 ```bash
 # ベーステンプレートでプロジェクト生成
-uvx copier copy --trust gh:nishide-dev/uv-nix-template my-gpu-project
-cd my-gpu-project
+uvx copier copy --trust gh:nishide-dev/uv-nix-template my-torch-project
+cd my-torch-project
 
-# CUDA/Nix拡張を追加適用
-uvx copier copy --trust gh:nishide-dev/uv-cuda-nix-template .
+# PyTorch/CUDA拡張を追加適用
+uvx copier copy --trust gh:nishide-dev/uv-torch-nix-template .
 ```
 
 ## 📄 ライセンス
