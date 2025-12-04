@@ -93,70 +93,54 @@
             export PATH="''${HOME}/.npm-global/bin:$PATH"
             mkdir -p "''${HOME}/.npm-global/bin"
 
-            # AI CLIツールのインストール確認とインストール
-            echo ""
-            echo "=================================================="
-            echo -e "''${BLUE}Checking AI CLI Tools...''${NC}"
-            echo "=================================================="
-
-            # Claude Code CLIのインストール確認
+            # AI CLIツールを静かにインストール（未インストールの場合のみ）
             if ! command -v claude &> /dev/null; then
-              echo -e "''${YELLOW}Installing Claude Code CLI...''${NC}"
-              npm install -g @anthropic-ai/claude-code 2>/dev/null || {
-                echo -e "''${YELLOW}Falling back to curl installation method...''${NC}"
-                curl -fsSL https://claude.ai/install.sh | bash
-              }
+              npm install -g @anthropic-ai/claude-code &>/dev/null || curl -fsSL https://claude.ai/install.sh | bash &>/dev/null
             fi
-
-            # OpenAI Codexのインストール確認
             if ! command -v codex &> /dev/null; then
-              echo -e "''${YELLOW}Installing OpenAI Codex...''${NC}"
-              npm install -g @openai/codex 2>/dev/null || {
-                echo -e "''${YELLOW}Note: OpenAI Codex installation failed. You may need to install it manually.''${NC}"
-              }
+              npm install -g @openai/codex &>/dev/null || true
             fi
-
-            # Gemini CLIのインストール確認
             if ! command -v gemini &> /dev/null; then
-              echo -e "''${YELLOW}Installing Gemini CLI...''${NC}"
-              npm install -g @google/gemini-cli 2>/dev/null || {
-                echo -e "''${YELLOW}Note: Gemini CLI installation failed. You may need to install it manually.''${NC}"
-              }
+              npm install -g @google/gemini-cli &>/dev/null || true
             fi
 
-            echo ""
-            echo "=================================================="
-            echo -e "''${GREEN}Development Environment Ready''${NC}"
-            echo "=================================================="
-            echo "Python:      $(python --version)"
-            echo "uv:          $(uv --version)"
-            echo "Node.js:     $(node --version)"
-            echo "npm:         $(npm --version)"
+            # 簡潔な環境情報表示
+            PYTHON_VER=$(python --version 2>&1 | cut -d' ' -f2)
+            UV_VER=$(uv --version 2>&1 | cut -d' ' -f2)
 
-            # CLIツールのバージョン確認（インストール済みの場合のみ）
-            if command -v claude &> /dev/null; then
-              echo "Claude Code: $(claude --version 2>/dev/null || echo 'installed')"
-            fi
-            if command -v codex &> /dev/null; then
-              echo "OpenAI Codex: $(codex --version 2>/dev/null || echo 'installed')"
-            fi
-            if command -v gemini &> /dev/null; then
-              echo "Gemini CLI:  $(gemini --version 2>/dev/null || echo 'installed')"
-            fi
+            if [ "''${VERBOSE_INIT:-0}" = "1" ]; then
+              # 詳細モード
+              echo ""
+              echo "=================================================="
+              echo -e "''${GREEN}Development Environment Ready''${NC}"
+              echo "=================================================="
+              echo "Python:      $PYTHON_VER"
+              echo "uv:          $UV_VER"
+              echo "Node.js:     $(node --version)"
+              echo "npm:         $(npm --version)"
 
-            echo ""
-            echo "次のステップ:"
-            echo "  Python:"
-            echo "    uv sync              # 依存関係のインストール"
-            echo "    uv add <package>     # パッケージの追加"
-            echo "    uv run pytest        # テストの実行"
-            echo ""
-            echo "  AI CLIs:"
-            echo "    claude               # Claude Code CLI"
-            echo "    codex                # OpenAI Codex"
-            echo "    gemini               # Gemini CLI"
-            echo "=================================================="
-            echo ""
+              if command -v claude &> /dev/null; then
+                echo "claude:      $(claude --version 2>/dev/null || echo 'installed')"
+              fi
+              if command -v codex &> /dev/null; then
+                echo "codex:       $(codex --version 2>/dev/null || echo 'installed')"
+              fi
+              if command -v gemini &> /dev/null; then
+                echo "gemini:      $(gemini --version 2>/dev/null || echo 'installed')"
+              fi
+
+              echo ""
+              echo "Commands:"
+              echo "  uv sync              # Install dependencies"
+              echo "  uv add <package>     # Add a package"
+              echo "  uv run pytest        # Run tests"
+              echo "  claude / codex / gemini  # AI CLI tools"
+              echo "=================================================="
+              echo ""
+            else
+              # 簡潔モード（デフォルト）
+              echo -e "''${GREEN}✓''${NC} Dev environment ready (Python $PYTHON_VER, uv $UV_VER)"
+            fi
           '';
         };
       }
