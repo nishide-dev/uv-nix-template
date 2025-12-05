@@ -27,6 +27,17 @@
 - **Node.js統合**: Claude Code CLI、Gemini CLI自動インストール
 - **即座に利用可能**: Nix環境構築時に自動セットアップ
 
+## 🔥 PyTorch/CUDAが必要な場合
+
+**GPUを使った機械学習開発には、派生テンプレートがあります：**
+
+👉 **[uv-torch-nix-template](https://github.com/nishide-dev/uv-torch-nix-template)** - PyTorch/CUDA特化版
+
+- PyTorch + CUDA環境をプリセットで簡単設定（16種類の組み合わせ）
+- CUDAバージョン管理（13.0/12.8/12.6/12.4/12.1/11.8）
+- Ubuntu/Debian等でのCUDA有効化ガイド付き
+- このテンプレートのすべての機能を継承
+
 ## 🚀 クイックスタート
 
 ### 前提条件
@@ -187,21 +198,25 @@ uvx copier update
 git diff
 ```
 
-## 🎯 拡張テンプレート
+## 🎯 派生テンプレート
 
-このベーステンプレートに加えて、以下の拡張テンプレートも利用可能です：
+このテンプレートをベースにした、特化版テンプレートも利用可能です：
 
-- **[uv-torch-nix-template](https://github.com/nishide-dev/uv-torch-nix-template)**: PyTorch/CUDA環境とNixによるシステムレベル再現性を追加
+### PyTorch/CUDA特化版
 
-拡張テンプレートの適用方法：
+👉 **[uv-torch-nix-template](https://github.com/nishide-dev/uv-torch-nix-template)**
+
+GPU機械学習開発向けに最適化されたテンプレート：
+- PyTorch + CUDA環境をプリセットで簡単設定（16種類）
+- CUDAバージョン管理（13.0/12.8/12.6/12.4/12.1/11.8）
+- Ubuntu/Debian等でのCUDA有効化ガイド
+- このテンプレートのすべての機能を継承
+
+**使い方**：
 
 ```bash
-# ベーステンプレートでプロジェクト生成
-uvx copier copy --trust gh:nishide-dev/uv-nix-template my-torch-project
-cd my-torch-project
-
-# PyTorch/CUDA拡張を追加適用
-uvx copier copy --trust gh:nishide-dev/uv-torch-nix-template .
+# PyTorch/CUDA環境込みで1コマンドで生成
+uvx copier copy --trust gh:nishide-dev/uv-torch-nix-template my-torch-project
 ```
 
 ## 📄 ライセンス
