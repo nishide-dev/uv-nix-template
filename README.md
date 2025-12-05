@@ -122,6 +122,7 @@ Copierは以下の質問をします：
 | `use_ty` | ty（型チェッカー）を使うか | `true` | - |
 | `use_pytest` | Pytest（テストフレームワーク）を使うか | `true` | - |
 | `use_github_actions` | GitHub Actions CI/CDを設定するか | `true` | - |
+| `include_docker` | Docker環境（開発用・本番用）を含めるか | `false` | - |
 | `use_nix` | Nix + direnv環境管理を使うか | `true` | - |
 | `setup_direnv_hook` | シェル設定ファイルにdirenv hookを自動追加するか（`use_nix=true`の場合のみ） | `false` | - |
 
@@ -141,9 +142,14 @@ my-awesome-project/
 │       └── test.yml          # CI/CDワークフロー
 ├── flake.nix                 # Nix環境定義（use_nix=trueの場合）
 ├── .envrc                    # direnv設定（use_nix=trueの場合）
+├── Dockerfile.dev            # 開発用Dockerイメージ（include_docker=trueの場合）
+├── Dockerfile.prod           # 本番用Dockerイメージ（include_docker=trueの場合）
+├── docker-compose.yml        # Docker Compose設定（include_docker=trueの場合）
+├── .dockerignore             # Docker除外設定（include_docker=trueの場合）
 ├── docs/
 │   ├── NIX_SETUP.md          # Nixセットアップガイド
-│   └── AI_CLI_TOOLS.md       # AI CLIツールガイド
+│   ├── AI_CLI_TOOLS.md       # AI CLIツールガイド
+│   └── DOCKER.md             # Docker環境ガイド（include_docker=trueの場合）
 ├── pyproject.toml            # プロジェクト設定（PEP 621）
 ├── uv.lock                   # 依存関係のロックファイル
 ├── .gitignore
@@ -151,6 +157,47 @@ my-awesome-project/
 ├── LICENSE
 └── README.md
 ```
+
+## 🐳 Docker環境
+
+デプロイやCI/CD、Nix非対応環境向けに、Docker環境を含めることができます（`include_docker=true`）。
+
+### 2種類のDockerfile
+
+- **Dockerfile.dev**: 開発用（ホットリロード、SSH対応、全ツール含む）
+- **Dockerfile.prod**: 本番用（マルチステージビルド、最小依存関係、セキュリティ強化）
+
+### クイックスタート
+
+```bash
+# 開発環境で起動
+docker compose up -d dev
+
+# インタラクティブシェル
+docker compose run --rm dev bash
+
+# テスト実行
+docker compose run --rm dev pytest
+
+# 本番イメージのビルド
+docker compose build prod
+
+# 本番環境で起動
+docker compose up -d prod
+```
+
+### Nix環境との使い分け
+
+| 用途 | 推奨環境 |
+|------|---------|
+| ローカル開発 | **Nix + direnv** |
+| デプロイ | **Docker** |
+| CI/CD | **Docker** または Nix |
+| チーム共有 | **Docker** |
+
+**重要**: `uv.lock` が両環境の依存関係を保証するため、Nix環境とDocker環境で全く同じバージョンがインストールされます。
+
+詳細は [`docs/DOCKER.md`](docs/DOCKER.md) を参照してください。
 
 ## 💡 開発ワークフロー例
 

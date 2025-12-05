@@ -1,0 +1,317 @@
+# Docker環境ガイド
+
+このプロジェクトには、開発用と本番用の2種類のDocker環境が用意されています。
+
+## 📋 目次
+
+- [概要](#概要)
+- [前提条件](#前提条件)
+- [開発環境（Dockerfile.dev）](#開発環境dockerfiledev)
+- [本番環境（Dockerfile.prod）](#本番環境dockerfileprod)
+- [docker-composeの使い方](#docker-composeの使い方)
+- [よくある質問](#よくある質問)
+
+---
+
+## 概要
+
+### 開発環境 vs 本番環境
+
+| 項目 | 開発環境（dev） | 本番環境（prod） |
+|------|----------------|-----------------|
+| **ベースイメージ** | `ghcr.io/astral-sh/uv:python{{ python_version }}` | `ubuntu:22.04` |
+| **依存関係** | 全依存関係（dev含む） | 本番依存関係のみ |
+| **ビルド方式** | シングルステージ | マルチステージ（最適化） |
+| **コードマウント** | ✅ ホットリロード対応 | ❌ イメージに固定 |
+| **SSH対応** | ✅ ポート2222 | ❌ |
+| **イメージサイズ** | 大きい | 小さい |
+| **用途** | ローカル開発・デバッグ | デプロイ・CI/CD |
+
+{% if use_nix %}
+### Nix環境との使い分け
+
+- **Nix (推奨)**: ローカル開発、再現性重視、複数プロジェクト管理
+- **Docker**: デプロイ、CI/CD、Nix非対応環境、チーム共有
+
+**ポイント**: `uv.lock` が両環境の依存関係を保証します。
+{% endif %}
+
+---
+
+## 前提条件
+
+### 必須ツール
+
+1. **Docker Desktop** または **Docker Engine**
+   ```bash
+   # インストール確認
+   docker --version
+   docker compose version
+   ```
+
+2. **ホストのユーザーID/グループID** (開発環境用)
+   ```bash
+   # 環境変数に設定（推奨）
+   export USER_ID=$(id -u)
+   export GROUP_ID=$(id -g)
+   export USERNAME=$(whoami)
+   ```
+
+---
+
+## 開発環境（Dockerfile.dev）
+
+### 特徴
+
+- ✅ **ホットリロード**: ホストのコードをマウント、変更が即反映
+- ✅ **SSH対応**: リモート開発環境として利用可能
+- ✅ **全開発ツール**: {% if use_ruff %}Ruff、{% endif %}{% if use_ty %}ty、{% endif %}{% if use_pytest %}Pytest{% endif %}など全て含む
+- ✅ **uvキャッシュ永続化**: 依存関係のダウンロードを高速化
+
+### ビルド
+
+```bash
+# Docker Composeを使う場合（推奨）
+docker compose build dev
+
+# 直接ビルドする場合
+docker build -f Dockerfile.dev -t {{ project_name }}-dev \
+  --build-arg USERNAME=$(whoami) \
+  --build-arg USER_ID=$(id -u) \
+  --build-arg GROUP_ID=$(id -g) \
+  .
+```
+
+### 実行
+
+```bash
+# インタラクティブシェル
+docker compose run --rm dev bash
+
+# Pythonスクリプト実行
+docker compose run --rm dev python -m {{ package_name }}.main
+
+# テスト実行
+{% if use_pytest %}
+docker compose run --rm dev pytest
+{% else %}
+docker compose run --rm dev python -m unittest
+{% endif %}
+
+# Linter/Formatter実行
+{% if use_ruff %}
+docker compose run --rm dev ruff check .
+docker compose run --rm dev ruff format .
+{% endif %}
+
+# サービスとして起動（バックグラウンド）
+docker compose up -d dev
+docker compose logs -f dev
+```
+
+### SSH経由でのアクセス
+
+```bash
+# コンテナをバックグラウンドで起動
+docker compose up -d dev
+
+# コンテナ内でSSHデーモンを起動
+docker compose exec dev sudo /usr/sbin/sshd
+
+# SSH公開鍵を配置
+docker compose exec -u $(whoami) dev mkdir -p ~/.ssh
+docker compose cp ~/.ssh/id_rsa.pub $(docker compose ps -q dev):/home/$(whoami)/.ssh/authorized_keys
+docker compose exec -u $(whoami) dev chmod 600 ~/.ssh/authorized_keys
+
+# SSHでアクセス
+ssh -p 2222 $(whoami)@localhost
+```
+
+---
+
+## 本番環境（Dockerfile.prod）
+
+### 特徴
+
+- ⚡ **最小イメージ**: マルチステージビルドで最適化
+- 🔒 **セキュリティ強化**: 非rootユーザー、read-only filesystem
+- 📦 **自己完結**: 依存関係とコードを全て含む
+- ♻️ **自動再起動**: `restart: unless-stopped` 設定済み
+
+### ビルド
+
+```bash
+# Docker Composeを使う場合（推奨）
+docker compose build prod
+
+# 直接ビルドする場合
+docker build -f Dockerfile.prod -t {{ project_name }}-prod \
+  --build-arg USERNAME=appuser \
+  .
+```
+
+### 実行
+
+```bash
+# フォアグラウンドで実行
+docker compose up prod
+
+# バックグラウンドで実行
+docker compose up -d prod
+
+# ログ確認
+docker compose logs -f prod
+
+# 停止
+docker compose down
+```
+
+### カスタムコマンド
+
+```bash
+# コマンドを指定して実行
+docker run --rm {{ project_name }}-prod python -c "import {{ package_name }}; print('OK')"
+
+# 環境変数を渡す
+docker run --rm -e MY_VAR=value {{ project_name }}-prod python -m {{ package_name }}.main
+
+# ポートマッピング
+docker run --rm -p 8080:8000 {{ project_name }}-prod python -m {{ package_name }}.server
+```
+
+---
+
+## docker-composeの使い方
+
+### 基本コマンド
+
+```bash
+# サービス一覧
+docker compose ps
+
+# ビルド（キャッシュなし）
+docker compose build --no-cache dev
+
+# ログ確認
+docker compose logs -f dev
+
+# コンテナに入る
+docker compose exec dev bash
+
+# 停止して削除
+docker compose down
+
+# ボリュームも削除
+docker compose down -v
+```
+
+### 環境変数の設定
+
+プロジェクトルートに `.env` ファイルを作成：
+
+```bash
+# .env
+USERNAME=myuser
+USER_ID=1000
+GROUP_ID=1000
+```
+
+### カスタマイズ
+
+`docker-compose.override.yml` を作成して設定を上書き：
+
+```yaml
+# docker-compose.override.yml
+services:
+  dev:
+    ports:
+      - "8080:8000"  # ポート変更
+    environment:
+      - DEBUG=true
+    volumes:
+      - ./custom:/app/custom  # 追加マウント
+```
+
+---
+
+## よくある質問
+
+### Q1: Nix環境とDocker環境で依存関係が異なることはある？
+
+A: **ありません**。`uv.lock` ファイルが両環境で共有されるため、全く同じバージョンの依存関係がインストールされます。
+
+### Q2: 開発環境でコードの変更が反映されない
+
+A: 以下を確認してください：
+1. `docker-compose.yml` で `.:/app` がマウントされているか
+2. コンテナが起動しているか（`docker compose ps`）
+3. ホットリロード対応のサーバーを使用しているか（uvicorn --reload など）
+
+### Q3: "permission denied" エラーが出る
+
+A: ホストとコンテナのユーザーIDが一致していません：
+
+```bash
+# 環境変数を設定
+export USER_ID=$(id -u)
+export GROUP_ID=$(id -g)
+export USERNAME=$(whoami)
+
+# 再ビルド
+docker compose build --no-cache dev
+```
+
+### Q4: イメージサイズを小さくしたい
+
+A: 本番環境（Dockerfile.prod）は既に最適化されていますが、さらに削減する場合：
+- 不要な依存関係を `pyproject.toml` から削除
+- `.dockerignore` を見直して不要なファイルを除外
+- Alpine Linuxベースに変更（ただしビルド時間が増える可能性あり）
+
+### Q5: Dockerビルドが遅い
+
+A: 以下を試してください：
+1. **uvキャッシュを活用**: `--mount=type=cache,target=/root/.cache/uv` は既に設定済み
+2. **BuildKitを有効化**: `export DOCKER_BUILDKIT=1`
+3. **依存関係を固定**: `uv.lock` を最新に保つ
+
+### Q6: 本番環境でシークレットを扱うには？
+
+A: 環境変数またはDocker Secretsを使用：
+
+```bash
+# 環境変数
+docker run --rm -e DATABASE_URL=postgresql://... {{ project_name }}-prod
+
+# Docker Secrets（Swarm/Kubernetes）
+docker secret create db_password /path/to/secret
+docker service create --secret db_password {{ project_name }}-prod
+```
+
+### Q7: CI/CDでDockerを使いたい
+
+A: GitHub Actionsの例：
+
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test
+        run: |
+          docker compose build prod
+          docker compose run --rm prod pytest
+```
+
+---
+
+## 参考リンク
+
+- [Docker公式ドキュメント](https://docs.docker.com/)
+- [Docker Compose公式ドキュメント](https://docs.docker.com/compose/)
+- [uv Docker統合ガイド](https://docs.astral.sh/uv/guides/integration/docker/)
+- [uv-docker-example](https://github.com/astral-sh/uv-docker-example)
+{% if use_nix %}
+- [Nix環境セットアップ](NIX_SETUP.md)
+{% endif %}
